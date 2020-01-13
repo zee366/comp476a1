@@ -24,6 +24,9 @@ public class AIMovement : MonoBehaviour
     private Vector3 mVelocity;
     private float mSpeed;
     private GameObject mTarget;
+
+    private Material mMaterial;
+
     private const float mEpsilon = 0.0001f;
     
     // Start is called before the first frame update
@@ -32,6 +35,7 @@ public class AIMovement : MonoBehaviour
         mTarget = null;
         mIsMoving = false;
         mLastPosition = transform.position;
+        mMaterial = GetComponent<Renderer>().material;
     }
 
     // Update is called once per frame
@@ -52,7 +56,10 @@ public class AIMovement : MonoBehaviour
                         distanceToTarget = targetDirection.sqrMagnitude;
                     }
                 }
-                mTarget = closestTarget;
+                if(closestTarget) {
+                    mTarget = closestTarget;
+                    mTarget.GetComponent<AIMovement>().SetTarget(true);
+                }
             }
             else {
                 float deltaPositionLength = (transform.position - mLastPosition).magnitude;
@@ -75,8 +82,14 @@ public class AIMovement : MonoBehaviour
                 else {
                     if(targetDirection.magnitude < radius) {
                         // reached the target
-                        mTarget.GetComponent<AIMovement>().SetFrozen(true);
+                        // TODO: refactor this to a Freeze() method
+                        AIMovement ai = mTarget.GetComponent<AIMovement>();
+                        ai.SetFrozen(true);
+                        ai.SetTarget(false);
+                        ai.SetMaterial(Color.cyan);
                         mTarget.tag = "Frozen";
+                        mTarget = null;
+                        mIsMoving = false;
                     }
                     targetDirection /= timeToTarget;
                     if(targetDirection.magnitude > mSpeed) {
@@ -93,6 +106,12 @@ public class AIMovement : MonoBehaviour
         }
         else {
             mSpeed = baseSpeed;
+            if(mIsTarget) {
+                // flee from pursuer
+            }
+            else {
+                // wander
+            }
         }
         
         /*
@@ -102,11 +121,23 @@ public class AIMovement : MonoBehaviour
         */
     }
 
+    public void SetTagged(bool status) {
+        mIsTagged = status;
+    }
+
     public void SetFrozen(bool status) {
         mIsFrozen = status;
     }
 
     public void SetTarget(bool status) {
         mIsTarget = status;
+    }
+
+    public void SetMaterial(Color c) {
+        mMaterial.color = c;
+    }
+
+    void OnDestroy() {
+        Destroy(mMaterial);
     }
 }
