@@ -105,12 +105,52 @@ public class AIMovement : MonoBehaviour
             }
         }
         else {
-            mSpeed = baseSpeed;
-            if(mIsTarget) {
-                // flee from pursuer
+            if(!mIsFrozen) {
+                mSpeed = baseSpeed;
+                if(mIsTarget) {
+                    // flee from pursuer
+                    mTarget = GameObject.FindGameObjectWithTag("Tagged");
+                    Vector3 targetDirection = transform.position - mTarget.transform.position;
+
+                    if(!mIsMoving) {
+                        if(targetDirection.magnitude < mEpsilon) {
+                            transform.position += targetDirection.normalized / 10.0f;
+                        }
+                        else {
+                            float step = rotationSpeed * Time.deltaTime; ;
+
+                            Quaternion rotation = Quaternion.LookRotation(targetDirection, Vector3.up);
+                            transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, step);
+
+                            if(transform.forward == targetDirection.normalized)
+                                mIsMoving = true;
+                        }
+                    }
+                    else {
+                        targetDirection /= timeToTarget;
+                        if(targetDirection.magnitude > mSpeed) {
+                            targetDirection = targetDirection.normalized * mSpeed;
+                        }
+                        float step = rotationSpeed * Time.deltaTime; ;
+
+                        Quaternion rotation = Quaternion.LookRotation(targetDirection, Vector3.up);
+                        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, step);
+
+                        transform.position += targetDirection * Time.deltaTime;
+                    }
+                }
+                else {
+                    // wander
+                    transform.position += transform.forward * mSpeed * Time.deltaTime;
+
+                    float angle = (Random.Range(-1.0f, 1.0f) - Random.Range(-1.0f, 1.0f));
+                    float step = angle * rotationSpeed * Time.deltaTime;
+                    Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, step);
+                }
             }
             else {
-                // wander
+                // frozen, do nothing
             }
         }
         
