@@ -533,7 +533,6 @@ GameObject:
   - component: {fileID: 719163839}
   - component: {fileID: 719163838}
   - component: {fileID: 719163837}
-  - component: {fileID: 719163836}
   m_Layer: 0
   m_Name: BoundaryEast
   m_TagString: Untagged
@@ -555,18 +554,6 @@ Transform:
   m_Father: {fileID: 707613606}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!114 &719163836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 719163834}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 868a68d78aea6c5488bf22cadc5654ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &719163837
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -638,7 +625,6 @@ GameObject:
   - component: {fileID: 947257565}
   - component: {fileID: 947257564}
   - component: {fileID: 947257563}
-  - component: {fileID: 947257562}
   m_Layer: 0
   m_Name: BoundaryNorth
   m_TagString: Untagged
@@ -660,18 +646,6 @@ Transform:
   m_Father: {fileID: 707613606}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &947257562
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 947257560}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 868a68d78aea6c5488bf22cadc5654ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &947257563
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1031,7 +1005,6 @@ GameObject:
   - component: {fileID: 2036091291}
   - component: {fileID: 2036091290}
   - component: {fileID: 2036091289}
-  - component: {fileID: 2036091288}
   m_Layer: 0
   m_Name: BoundaryWest
   m_TagString: Untagged
@@ -1053,18 +1026,6 @@ Transform:
   m_Father: {fileID: 707613606}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!114 &2036091288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2036091286}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 868a68d78aea6c5488bf22cadc5654ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &2036091289
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1136,7 +1097,6 @@ GameObject:
   - component: {fileID: 2129943268}
   - component: {fileID: 2129943267}
   - component: {fileID: 2129943266}
-  - component: {fileID: 2129943265}
   m_Layer: 0
   m_Name: BoundarySouth
   m_TagString: Untagged
@@ -1158,18 +1118,6 @@ Transform:
   m_Father: {fileID: 707613606}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2129943265
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2129943263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 868a68d78aea6c5488bf22cadc5654ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &2129943266
 BoxCollider:
   m_ObjectHideFlags: 0

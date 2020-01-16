@@ -20,9 +20,12 @@ public class AIMovement : MonoBehaviour
     private bool mHasTarget;
     private bool mIsTagged;
     private bool mIsFrozen;
+    private bool mHitBoundary;
     private Vector3 mLastPosition;
     private Vector3 mVelocity;
     private float mSpeed;
+    private float mChaseTimer;
+    private float mBoundaryTimer;
     private GameObject mTarget;
 
     private Material mMaterial;
@@ -34,6 +37,7 @@ public class AIMovement : MonoBehaviour
     {
         mTarget = null;
         mIsMoving = false;
+        mBoundaryTimer = 0.0f;
         mLastPosition = transform.position;
         mMaterial = GetComponent<Renderer>().material;
     }
@@ -41,27 +45,40 @@ public class AIMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Vector3 position = transform.position;
+        if(Mathf.Abs(position.x) > 17.5f) {
+            position.x += position.x > 0 ? -0.5f : 0.5f;
+            position.x *= -1;
+            if(mIsTarget) {
+                mHitBoundary = true;
+                mBoundaryTimer = 2.0f;
+            }
+        }
+        else if(Mathf.Abs(position.z) > 17.5f) {
+            position.z += position.z > 0 ? -0.5f : 0.5f;
+            position.z *= -1;
+            if(mIsTarget) {
+                mHitBoundary = true;
+                mBoundaryTimer = 2.0f;
+            }
+        }
+
+        transform.position = position;
+
         if(mIsTagged) {
             mSpeed = chaseSpeed;
             if(!mTarget) {
                 // find a target
-                GameObject[] targets = GameObject.FindGameObjectsWithTag("Free");
-
-                GameObject closestTarget = null;
-                float distanceToTarget = Mathf.Infinity;
-                for(int i = 0; i < targets.Length; i++) {
-                    Vector3 targetDirection = targets[i].transform.position - transform.position;
-                    if(targetDirection.sqrMagnitude < distanceToTarget) {
-                        closestTarget = targets[i];
-                        distanceToTarget = targetDirection.sqrMagnitude;
-                    }
-                }
-                if(closestTarget) {
-                    mTarget = closestTarget;
-                    mTarget.GetComponent<AIMovement>().SetTarget(true);
-                }
+                FindClosest();
+                mChaseTimer = 3.0f;
             }
             else {
+                mChaseTimer -= Time.deltaTime;
+                if(mChaseTimer < 0.0f) {
+                    FindClosest();
+                    mChaseTimer = 3.0f;
+                }
+
                 float deltaPositionLength = (transform.position - mLastPosition).magnitude;
                 Vector3 targetDirection = mTarget.transform.position - transform.position;
 
@@ -91,16 +108,18 @@ public class AIMovement : MonoBehaviour
                         mTarget = null;
                         mIsMoving = false;
                     }
-                    targetDirection /= timeToTarget;
-                    if(targetDirection.magnitude > mSpeed) {
-                        targetDirection = targetDirection.normalized * mSpeed;
+                    else {
+                        targetDirection /= timeToTarget;
+                        if(targetDirection.magnitude > mSpeed) {
+                            targetDirection = targetDirection.normalized * mSpeed;
+                        }
+                        float step = rotationSpeed * Time.deltaTime; ;
+
+                        Quaternion rotation = Quaternion.LookRotation(targetDirection, Vector3.up);
+                        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, step);
+
+                        transform.position += targetDirection * Time.deltaTime;
                     }
-                    float step = rotationSpeed * Time.deltaTime; ;
-
-                    Quaternion rotation = Quaternion.LookRotation(targetDirection, Vector3.up);
-                    transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, step);
-
-                    transform.position += targetDirection * Time.deltaTime;
                 }
             }
         }
@@ -108,9 +127,19 @@ public class AIMovement : MonoBehaviour
             if(!mIsFrozen) {
                 mSpeed = baseSpeed;
                 if(mIsTarget) {
+
+                    // recently transitioned to other side of level, keep moving forward so it doesn't bounce back accross the boundary
+                    //if(mHitBoundary) {
+                    //    mBoundaryTimer -= Time.deltaTime;
+                    //    if(mBoundaryTimer < 0.0f)
+                    //        mHitBoundary = false;
+                    //    transform.position += transform.forward * mSpeed * Time.deltaTime;
+                    //}
                     // flee from pursuer
                     mTarget = GameObject.FindGameObjectWithTag("Tagged");
                     Vector3 targetDirection = transform.position - mTarget.transform.position;
+                    if(transform.forward != targetDirection.normalized)
+                        mIsMoving = false;
 
                     if(!mIsMoving) {
                         if(targetDirection.magnitude < mEpsilon) {
@@ -127,7 +156,7 @@ public class AIMovement : MonoBehaviour
                         }
                     }
                     else {
-                        targetDirection /= timeToTarget;
+                        //targetDirection /= timeToTarget;
                         if(targetDirection.magnitude > mSpeed) {
                             targetDirection = targetDirection.normalized * mSpeed;
                         }
@@ -161,6 +190,27 @@ public class AIMovement : MonoBehaviour
         */
     }
 
+    void FindClosest() {
+        if(mTarget)
+            mTarget.GetComponent<AIMovement>().SetTarget(false);
+
+        GameObject[] targets = GameObject.FindGameObjectsWithTag("Free");
+
+        GameObject closestTarget = null;
+        float distanceToTarget = Mathf.Infinity;
+        for(int i = 0; i < targets.Length; i++) {
+            Vector3 targetDirection = targets[i].transform.position - transform.position;
+            if(targetDirection.sqrMagnitude < distanceToTarget) {
+                closestTarget = targets[i];
+                distanceToTarget = targetDirection.sqrMagnitude;
+            }
+        }
+        if(closestTarget) {
+            mTarget = closestTarget;
+            mTarget.GetComponent<AIMovement>().SetTarget(true);
+        }
+    }
+
     public void SetTagged(bool status) {
         mIsTagged = status;
     }
@@ -171,6 +221,18 @@ public class AIMovement : MonoBehaviour
 
     public void SetTarget(bool status) {
         mIsTarget = status;
+    }
+
+    public bool IsTarget() {
+        return mIsTarget;
+    }
+
+    public void SetHitBoundary(bool status) {
+        mHitBoundary = status;
+    }
+
+    public void SetBoundaryTimer() {
+        mBoundaryTimer = 2.0f;
     }
 
     public void SetMaterial(Color c) {

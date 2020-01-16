@@ -125,10 +125,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseSpeed: 4
-  chaseSpeed: 6
+  chaseSpeed: 7
   rotationSpeed: 100
   radius: 1.4
-  timeToTarget: 1
+  timeToTarget: 0.2
 --- !u!1 &8003399482642134713
 GameObject:
   m_ObjectHideFlags: 0
