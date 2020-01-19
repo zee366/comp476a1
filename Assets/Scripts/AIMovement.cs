@@ -51,7 +51,7 @@ public class AIMovement : MonoBehaviour
             position.x *= -1;
             if(mIsTarget) {
                 mHitBoundary = true;
-                mBoundaryTimer = 2.0f;
+                mBoundaryTimer = 4.0f;
             }
         }
         else if(Mathf.Abs(position.z) > 17.5f) {
@@ -59,7 +59,7 @@ public class AIMovement : MonoBehaviour
             position.z *= -1;
             if(mIsTarget) {
                 mHitBoundary = true;
-                mBoundaryTimer = 2.0f;
+                mBoundaryTimer = 4.0f;
             }
         }
 
@@ -129,12 +129,12 @@ public class AIMovement : MonoBehaviour
                 if(mIsTarget) {
 
                     // recently transitioned to other side of level, keep moving forward so it doesn't bounce back accross the boundary
-                    //if(mHitBoundary) {
-                    //    mBoundaryTimer -= Time.deltaTime;
-                    //    if(mBoundaryTimer < 0.0f)
-                    //        mHitBoundary = false;
-                    //    transform.position += transform.forward * mSpeed * Time.deltaTime;
-                    //}
+                    if(mHitBoundary) {
+                        mBoundaryTimer -= Time.deltaTime;
+                        if(mBoundaryTimer < 0.0f)
+                            mHitBoundary = false;
+                        transform.position += transform.forward * mSpeed * Time.deltaTime;
+                    }
                     // flee from pursuer
                     mTarget = GameObject.FindGameObjectWithTag("Tagged");
                     Vector3 targetDirection = transform.position - mTarget.transform.position;
