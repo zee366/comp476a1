@@ -55,18 +55,20 @@ public class AIMovement : MonoBehaviour
         CheckBoundary();
 
         if(mIsTagged) {
+            // start the particle system
+            gameObject.GetComponent<ParticleSystem>().Play();
             // behavior for tagged character
             mSpeed = chaseSpeed;
-
-            // find a target to chase
-            
 
             float deltaPositionLength = (transform.position - mLastPosition).magnitude;
             if(!mTarget) {
                 mTarget = FindClosest("Free");
                 if(mTarget) {
                     mTarget.GetComponent<AIMovement>().SetTarget(true);
-                    mChaseTimer = 1.5f;
+                    mChaseTimer = 2.0f;
+                }
+                else {
+                    Wander();
                 }
             }
             else {
@@ -76,7 +78,7 @@ public class AIMovement : MonoBehaviour
                     mTarget = FindClosest("Free");
                     if(mTarget) {
                         mTarget.GetComponent<AIMovement>().SetTarget(true);
-                        mChaseTimer = 1.5f;
+                        mChaseTimer = 2.0f;
                     }
                 }
                 if(mTarget) {
@@ -116,6 +118,8 @@ public class AIMovement : MonoBehaviour
             }
         }
         else {
+            // turn off particles
+            gameObject.GetComponent<ParticleSystem>().Stop();
             // behavior for untagged characters
             if(!mIsFrozen) {
                 mSpeed = baseSpeed;
@@ -244,14 +248,16 @@ public class AIMovement : MonoBehaviour
                 mHitBoundary = true;
                 mBoundaryTimer = 2.0f;
             }
+            gameObject.GetComponent<ParticleSystem>().Clear();
         }
         else if(Mathf.Abs(position.z) > 17.5f) {
             position.z += position.z > 0 ? -0.5f : 0.5f;
             position.z *= -1;
             if(mIsTarget) {
                 mHitBoundary = true;
-                mBoundaryTimer = 4.0f;
+                mBoundaryTimer = 2.0f;
             }
+            gameObject.GetComponent<ParticleSystem>().Clear();
         }
 
         transform.position = position;
