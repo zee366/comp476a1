@@ -31,6 +31,7 @@ public class AIMovement : MonoBehaviour
     private float mBoundaryTimer;
     private GameObject mTarget;
 
+    private Animator mAnimator;
     private Material mMaterial;
 
     private const float mEpsilon = 0.0001f;
@@ -43,6 +44,7 @@ public class AIMovement : MonoBehaviour
         mBoundaryTimer = 0.0f;
         mLastPosition = transform.position;
         mMaterial = GetComponent<Renderer>().material;
+        mAnimator = GetComponent<Animator>();
         mPerceptionAngle = 45.0f;
     }
 
@@ -51,12 +53,13 @@ public class AIMovement : MonoBehaviour
     {
         // TODO: Implement reset if all targets are frozen
 
-        // Warp character to toher side if they hit the level boundary
+        // Warp character to other side if they hit the level boundary
         CheckBoundary();
 
         if(mIsTagged) {
             // start the particle system
             gameObject.GetComponent<ParticleSystem>().Play();
+
             // behavior for tagged character
             mSpeed = chaseSpeed;
 
