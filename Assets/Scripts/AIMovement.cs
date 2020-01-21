@@ -14,6 +14,8 @@ public class AIMovement : MonoBehaviour
     float radius;
     [SerializeField]
     float timeToTarget;
+    [SerializeField]
+    GameObject prefab;
 
     // States
     private bool mIsMoving;
@@ -25,11 +27,14 @@ public class AIMovement : MonoBehaviour
 
     private Vector3 mLastPosition;
     private Vector3 mVelocity;
+    private float mMaxVelocity;
     private float mPerceptionAngle;
     private float mSpeed;
     private float mChaseTimer;
     private float mBoundaryTimer;
     private GameObject mTarget;
+    private GameObject mIceBlock;
+    private GameController mGameController;
 
     private Animator mAnimator;
     private Material mMaterial;
@@ -45,6 +50,7 @@ public class AIMovement : MonoBehaviour
         mLastPosition = transform.position;
         mMaterial = GetComponent<Renderer>().material;
         mAnimator = GetComponent<Animator>();
+        mGameController = GameObject.Find("GameController").GetComponent<GameController>();
         mPerceptionAngle = 45.0f;
     }
 
@@ -62,8 +68,9 @@ public class AIMovement : MonoBehaviour
 
             // behavior for tagged character
             mSpeed = chaseSpeed;
+            mMaxVelocity = mSpeed;
 
-            float deltaPositionLength = (transform.position - mLastPosition).magnitude;
+            //float deltaPositionLength = (transform.position - mLastPosition).magnitude;
             if(!mTarget) {
                 mTarget = FindClosest("Free");
                 if(mTarget) {
@@ -72,12 +79,15 @@ public class AIMovement : MonoBehaviour
                 }
                 else {
                     Wander();
+                    mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
                 }
             }
             else {
                 mChaseTimer -= Time.deltaTime;
                 if(mChaseTimer <= 0.0f) {
-                    mTarget.gameObject.GetComponent<AIMovement>().SetTarget(false);
+                    AIMovement targetAI = mTarget.gameObject.GetComponent<AIMovement>();
+                    targetAI.SetTarget(false);
+                    targetAI.tag = "Free";
                     mTarget = FindClosest("Free");
                     if(mTarget) {
                         mTarget.GetComponent<AIMovement>().SetTarget(true);
@@ -93,6 +103,7 @@ public class AIMovement : MonoBehaviour
                         }
                         else {
                             Align(targetDirection);
+                            mAnimator.SetFloat("Blend", 0.0f);
 
                             if(transform.forward == targetDirection.normalized)
                                 mIsMoving = true;
@@ -110,10 +121,12 @@ public class AIMovement : MonoBehaviour
                             float angle = Vector3.Angle(targetDirection, transform.forward);
                             if(angle < mPerceptionAngle) {
                                 Pursue(mTarget);
+                                mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
                             }
                             else {
                                 mIsMoving = false;
                                 Align(targetDirection);
+                                mAnimator.SetFloat("Blend", 0.0f);
                             }
                         }
                     }
@@ -126,6 +139,7 @@ public class AIMovement : MonoBehaviour
             // behavior for untagged characters
             if(!mIsFrozen) {
                 mSpeed = baseSpeed;
+                mMaxVelocity = mSpeed;
 
                 if(mIsTarget) {
 
@@ -134,7 +148,7 @@ public class AIMovement : MonoBehaviour
                         mBoundaryTimer -= Time.deltaTime;
                         if(mBoundaryTimer < 0.0f)
                             mHitBoundary = false;
-                        transform.position += transform.forward * mSpeed * Time.deltaTime;
+                        Seek(transform.forward);
                     }
                     else {
                         // flee from pursuer
@@ -148,6 +162,8 @@ public class AIMovement : MonoBehaviour
                                 }
                                 else {
                                     Align(targetDirection);
+                                    mAnimator.SetFloat("Blend", 0.0f);
+
                                     if(transform.forward == targetDirection.normalized)
                                         mIsMoving = true;
                                 }
@@ -155,11 +171,15 @@ public class AIMovement : MonoBehaviour
                             else {
                                 // TODO: Add speed dependant angle of perception
                                 float angle = Vector3.Angle(targetDirection, transform.forward);
-                                if(angle < mPerceptionAngle)
+                                if(angle < mPerceptionAngle) {
                                     // Note that since targetDirection is inversed (transform.pos - target.pos) Seek is essentially a flee behavior
                                     Seek(targetDirection);
-                                else
+                                    mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
+                                }
+                                else {
                                     mIsMoving = false;
+                                    mAnimator.SetFloat("Blend", 0.0f);
+                                }
                                 Align(targetDirection);
                             }
                         }
@@ -176,6 +196,8 @@ public class AIMovement : MonoBehaviour
                             }
                             else {
                                 Align(targetDirection);
+                                mAnimator.SetFloat("Blend", 0.0f);
+
                                 if(transform.forward == targetDirection.normalized)
                                     mIsMoving = true;
                             }
@@ -189,21 +211,30 @@ public class AIMovement : MonoBehaviour
                             }
                             else {
                                 float angle = Vector3.Angle(targetDirection, transform.forward);
-                                if(angle < mPerceptionAngle)
+                                if(angle < mPerceptionAngle) {
                                     Arrive(targetDirection);
-                                else
+                                    mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
+                                }
+                                else {
                                     mIsMoving = false;
+                                    mAnimator.SetFloat("Blend", 0.0f);
+                                }
                                 Align(targetDirection);
                             }
                         }
                     }
                     else {
                         Wander();
+                        mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
                     }
                 }
             }
             else {
                 // frozen, do nothing
+                mSpeed = 0.0f;
+                // = transform.position;
+                //mAnimator.StopPlayback();
+                mAnimator.SetFloat("Blend", 0.0f);
             }
         }
     }
@@ -211,14 +242,21 @@ public class AIMovement : MonoBehaviour
     void Freeze() {
         SetFrozen(true);
         SetTarget(false);
-        SetMaterial(Color.cyan);
+        //SetMaterial(Color.cyan);
         gameObject.tag = "Frozen";
+        //mGameController.CreateIceBlock(gameObject);
+        mIceBlock = Instantiate(prefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f));
     }
 
     void UnFreeze() {
         SetFrozen(false);
-        SetMaterial(Color.green);
+        //SetMaterial(Color.green);
         gameObject.tag = "Free";
+        //mGameController.ShatterIceBlock(gameObject);
+        Animation anim = mIceBlock.GetComponent<Animation>();
+        anim.Play();
+        Destroy(mIceBlock, 1.5f);
+        mIceBlock = null;
     }
 
     GameObject FindClosest(string tag) {
@@ -280,8 +318,9 @@ public class AIMovement : MonoBehaviour
     }
 
     void Seek(Vector3 direction) {
-        mVelocity = direction.normalized * mSpeed;
-
+        mVelocity = direction * mSpeed;
+        if(mVelocity.magnitude > mMaxVelocity)
+            mVelocity = mVelocity.normalized * mMaxVelocity;
         transform.position += mVelocity * Time.deltaTime;
     }
 
@@ -292,9 +331,9 @@ public class AIMovement : MonoBehaviour
     }
 
     void Arrive(Vector3 direction) {
-        mVelocity = direction /= timeToTarget;
-        if(mVelocity.magnitude > mSpeed) {
-            mVelocity = mVelocity.normalized * mSpeed;
+        mVelocity = (direction / timeToTarget) * mSpeed;
+        if(mVelocity.magnitude > mMaxVelocity) {
+            mVelocity = mVelocity.normalized * mMaxVelocity;
         }
         transform.position += mVelocity * Time.deltaTime;
     }
@@ -305,7 +344,10 @@ public class AIMovement : MonoBehaviour
         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, step);
 
-        transform.position += transform.forward * mSpeed * Time.deltaTime;
+        mVelocity = transform.forward * mSpeed;
+        if(mVelocity.magnitude > mMaxVelocity)
+            mVelocity = mVelocity.normalized * mMaxVelocity;
+        transform.position += mVelocity * Time.deltaTime;
     }
 
     public void SetTagged(bool status) {

@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
+    [SerializeField]
+    GameObject iceBlock;
+
     private GameObject[] mCharacters;
+    private Dictionary<int, GameObject> mIceBlocks;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -25,5 +30,15 @@ public class GameController : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void CreateIceBlock(GameObject character) {
+        mIceBlocks.Add(character.GetInstanceID(), Instantiate(iceBlock, character.transform));
+    }
+
+    public void ShatterIceBlock(GameObject character) {
+        GameObject block = mIceBlocks[character.GetInstanceID()];
+        Animation anim = block.GetComponent<Animation>();
+        anim.Play();
     }
 }
