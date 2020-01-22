@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class AIMovement : MonoBehaviour
 {
@@ -18,8 +17,6 @@ public class AIMovement : MonoBehaviour
     [SerializeField]
     GameObject prefab;
 
-    public UnityEvent onRoundEnd;
-
     // States
     private bool mIsMoving;
     private bool mIsTarget;
@@ -28,6 +25,7 @@ public class AIMovement : MonoBehaviour
     private bool mIsFrozen;
     private bool mHitBoundary;
 
+    private Vector3 mLastPosition;
     private Vector3 mVelocity;
     private float mMaxVelocity;
     private float mPerceptionAngle;
@@ -39,32 +37,40 @@ public class AIMovement : MonoBehaviour
     private GameController mGameController;
 
     private Animator mAnimator;
+    private Material mMaterial;
 
     private const float mEpsilon = 0.0001f;
     
+    // Start is called before the first frame update
     void Start()
     {
         mTarget = null;
         mIsMoving = false;
         mBoundaryTimer = 0.0f;
+        mLastPosition = transform.position;
+        mMaterial = GetComponent<Renderer>().material;
         mAnimator = GetComponent<Animator>();
         mGameController = GameObject.Find("GameController").GetComponent<GameController>();
         mPerceptionAngle = 45.0f;
     }
 
+    // Update is called once per frame
     void Update()
     {
+        // TODO: Implement reset if all targets are frozen
+
         // Warp character to other side if they hit the level boundary
         CheckBoundary();
 
-        // behavior for pursuer
         if(mIsTagged) {
             // start the particle system
             gameObject.GetComponent<ParticleSystem>().Play();
 
+            // behavior for tagged character
             mSpeed = chaseSpeed;
             mMaxVelocity = mSpeed;
 
+            //float deltaPositionLength = (transform.position - mLastPosition).magnitude;
             if(!mTarget) {
                 mTarget = FindClosest("Free");
                 if(mTarget) {
@@ -74,13 +80,11 @@ public class AIMovement : MonoBehaviour
                 else {
                     Wander();
                     mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
-                    onRoundEnd?.Invoke();
                 }
             }
             else {
                 mChaseTimer -= Time.deltaTime;
                 if(mChaseTimer <= 0.0f) {
-                    // chased target for too long, switch to another
                     AIMovement targetAI = mTarget.gameObject.GetComponent<AIMovement>();
                     targetAI.SetTarget(false);
                     targetAI.tag = "Free";
@@ -90,7 +94,6 @@ public class AIMovement : MonoBehaviour
                         mChaseTimer = 2.0f;
                     }
                 }
-
                 if(mTarget) {
                     Vector3 targetDirection = mTarget.transform.position - transform.position;
 
@@ -130,11 +133,10 @@ public class AIMovement : MonoBehaviour
                 }
             }
         }
-        // behavior for chased characters
-        else { // if(mIsTagged)
+        else {
             // turn off particles
             gameObject.GetComponent<ParticleSystem>().Stop();
-
+            // behavior for untagged characters
             if(!mIsFrozen) {
                 mSpeed = baseSpeed;
                 mMaxVelocity = mSpeed;
@@ -183,7 +185,7 @@ public class AIMovement : MonoBehaviour
                         }
                     }
                 }
-                else { // if(mIsTarget)
+                else {
                     // find a target to free
                     mTarget = FindClosest("Frozen");
                     if(mTarget) {
@@ -221,39 +223,40 @@ public class AIMovement : MonoBehaviour
                             }
                         }
                     }
-                    else { // if(mTarget)
-                        // no friends are frozen, wander around
+                    else {
                         Wander();
                         mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
                     }
                 }
             }
-            else { // if(!mIsFrozen)
+            else {
                 // frozen, do nothing
                 mSpeed = 0.0f;
+                // = transform.position;
+                //mAnimator.StopPlayback();
                 mAnimator.SetFloat("Blend", 0.0f);
             }
         }
     }
 
-    // HELPER FUNCTIONS
-
-    public void Freeze() {
+    void Freeze() {
         SetFrozen(true);
         SetTarget(false);
+        //SetMaterial(Color.cyan);
         gameObject.tag = "Frozen";
+        //mGameController.CreateIceBlock(gameObject);
         mIceBlock = Instantiate(prefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f));
     }
 
-    public void UnFreeze() {
+    void UnFreeze() {
         SetFrozen(false);
-        SetTagged(false);
+        //SetMaterial(Color.green);
         gameObject.tag = "Free";
-        if(mIceBlock) {
-            mIceBlock.GetComponent<Animation>().Play();
-            Destroy(mIceBlock, 1.5f);
-            mIceBlock = null;
-        }
+        //mGameController.ShatterIceBlock(gameObject);
+        Animation anim = mIceBlock.GetComponent<Animation>();
+        anim.Play();
+        Destroy(mIceBlock, 1.5f);
+        mIceBlock = null;
     }
 
     GameObject FindClosest(string tag) {
@@ -282,22 +285,24 @@ public class AIMovement : MonoBehaviour
         if(Mathf.Abs(position.x) > 17.5f) {
             position.x += position.x > 0 ? -0.5f : 0.5f;
             position.x *= -1;
+            if(mIsTarget) {
+                mHitBoundary = true;
+                mBoundaryTimer = 2.0f;
+            }
+            gameObject.GetComponent<ParticleSystem>().Clear();
         }
         else if(Mathf.Abs(position.z) > 17.5f) {
             position.z += position.z > 0 ? -0.5f : 0.5f;
             position.z *= -1;
+            if(mIsTarget) {
+                mHitBoundary = true;
+                mBoundaryTimer = 2.0f;
+            }
+            gameObject.GetComponent<ParticleSystem>().Clear();
         }
 
-        if(mIsTarget) {
-            mHitBoundary = true;
-            mBoundaryTimer = 2.0f;
-        }
-
-        gameObject.GetComponent<ParticleSystem>().Clear();
         transform.position = position;
     }
-
-    // MOVEMENT BEHAVIORS
 
     void Align(Vector3 direction) {
         float step = rotationSpeed * Time.deltaTime; ;
@@ -345,8 +350,6 @@ public class AIMovement : MonoBehaviour
         transform.position += mVelocity * Time.deltaTime;
     }
 
-    // STATE CHANGERS
-
     public void SetTagged(bool status) {
         mIsTagged = status;
     }
@@ -369,5 +372,13 @@ public class AIMovement : MonoBehaviour
 
     public void SetBoundaryTimer() {
         mBoundaryTimer = 2.0f;
+    }
+
+    public void SetMaterial(Color c) {
+        mMaterial.color = c;
+    }
+
+    void OnDestroy() {
+        Destroy(mMaterial);
     }
 }
