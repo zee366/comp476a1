@@ -127,6 +127,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 567192537786554671, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 7608fc5b3b1383e449b17056fba7678d, type: 2}
     - target: {fileID: 567192537799985263, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -186,6 +191,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Robot2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4620430091718798876, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: onRoundEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1965181526}
+    - target: {fileID: 4620430091718798876, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: onRoundEnd.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetRound
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d20c0d4b64255f44b7c750be8c0fb8b, type: 3}
@@ -287,6 +302,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 567192537786554671, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: cfe21b844451b59459a7b3f2676e3649, type: 2}
     - target: {fileID: 567192537799985263, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -346,6 +366,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Robot5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4620430091718798876, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: onRoundEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1965181526}
+    - target: {fileID: 4620430091718798876, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: onRoundEnd.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetRound
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d20c0d4b64255f44b7c750be8c0fb8b, type: 3}
@@ -518,8 +548,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.41390976, y: -0, z: -0, w: 0.91031796}
-  m_LocalPosition: {x: 0, y: 15.17, z: -20.89}
+  m_LocalRotation: {x: 0.3247477, y: -0.0014186928, z: 0.000487114, w: 0.9457995}
+  m_LocalPosition: {x: -0.14833288, y: 14.94503, z: -26.49691}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -532,6 +562,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 567192537786554671, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c6013f7829cd51e4884fcf154b86d22f, type: 2}
     - target: {fileID: 567192537799985263, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -592,6 +627,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Robot3
       objectReference: {fileID: 0}
+    - target: {fileID: 4620430091718798876, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: onRoundEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1965181526}
+    - target: {fileID: 4620430091718798876, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: onRoundEnd.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetRound
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d20c0d4b64255f44b7c750be8c0fb8b, type: 3}
 --- !u!1001 &1874700824
@@ -601,6 +646,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 567192537786554671, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 94ad9e7fcee2beb4bbdd091ea5e4d7d5, type: 2}
     - target: {fileID: 567192537799985263, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -661,53 +711,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Robot4
       objectReference: {fileID: 0}
+    - target: {fileID: 4620430091718798876, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: onRoundEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1965181526}
+    - target: {fileID: 4620430091718798876, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: onRoundEnd.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetRound
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d20c0d4b64255f44b7c750be8c0fb8b, type: 3}
---- !u!1 &1965181524
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1965181525}
-  - component: {fileID: 1965181526}
-  m_Layer: 0
-  m_Name: GameController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1965181525
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1965181524}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1965181526
+--- !u!114 &1965181526 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 5844968868916844783, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+    type: 3}
+  m_PrefabInstance: {fileID: 5844968867627209401}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1965181524}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5621c8fd3cb295348b25feaa13073d67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  iceBlock: {fileID: 5632163283982583302, guid: e3487aaccdd6eb04ea87d601b8d53338,
-    type: 3}
 --- !u!1 &1966426137
 GameObject:
   m_ObjectHideFlags: 0
@@ -879,5 +906,84 @@ PrefabInstance:
       propertyPath: m_Name
       value: Robot1
       objectReference: {fileID: 0}
+    - target: {fileID: 4620430091718798876, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: onRoundEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1965181526}
+    - target: {fileID: 4620430091718798876, guid: 4d20c0d4b64255f44b7c750be8c0fb8b,
+        type: 3}
+      propertyPath: onRoundEnd.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetRound
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d20c0d4b64255f44b7c750be8c0fb8b, type: 3}
+--- !u!1001 &5844968867627209401
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844780, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5844968868916844781, guid: dd2264e8bb3059042a71df6a4ccf79a5,
+        type: 3}
+      propertyPath: m_Name
+      value: GameController
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dd2264e8bb3059042a71df6a4ccf79a5, type: 3}
