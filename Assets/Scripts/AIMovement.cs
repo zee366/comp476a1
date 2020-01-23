@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 public class AIMovement : MonoBehaviour
 {
+    // modifiable attributes (in the Unity inspector)
     [SerializeField]
     float baseSpeed;
     [SerializeField]
@@ -18,16 +17,14 @@ public class AIMovement : MonoBehaviour
     [SerializeField]
     GameObject prefab;
 
-    public UnityEvent onRoundEnd;
-
     // States
     private bool mIsMoving;
     private bool mIsTarget;
-    private bool mHasTarget;
     private bool mIsTagged;
     private bool mIsFrozen;
     private bool mHitBoundary;
 
+    // Movement related variables
     private Vector3 mVelocity;
     private float mMaxVelocity;
     private float mPerceptionAngle;
@@ -35,12 +32,11 @@ public class AIMovement : MonoBehaviour
     private float mChaseTimer;
     private float mBoundaryTimer;
     private GameObject mTarget;
+
+    // other
+    public UnityEvent onRoundEnd;
     private GameObject mIceBlock;
-    private GameController mGameController;
-
     private Animator mAnimator;
-
-    private const float mEpsilon = 0.0001f;
     
     void Start()
     {
@@ -48,24 +44,26 @@ public class AIMovement : MonoBehaviour
         mIsMoving = false;
         mHitBoundary = false;
         mBoundaryTimer = 0.0f;
-        mAnimator = GetComponent<Animator>();
-        mGameController = GameObject.Find("GameController").GetComponent<GameController>();
         mPerceptionAngle = 45.0f;
+        mAnimator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        // Warp character to other side if they hit the level boundary
+        // Warp character to other side if they hit the level boundary, also clear the particle system particles
         if(CheckBoundary())
             gameObject.GetComponent<ParticleSystem>().Clear();
 
+        // We update how long it's been since the character hit a boundary
         mBoundaryTimer -= Time.deltaTime;
         if(mBoundaryTimer < 0.0f) {
             mBoundaryTimer = 0.0f;
             mHitBoundary = false;
         }
 
-        // behavior for pursuer
+        // ********************
+        // BEHAVIOR FOR PURSUER
+        // ********************
         if(mIsTagged) {
             // start the particle system
             gameObject.GetComponent<ParticleSystem>().Play();
@@ -73,27 +71,36 @@ public class AIMovement : MonoBehaviour
             mSpeed = chaseSpeed;
             mMaxVelocity = mSpeed;
 
+            // try to find a target if we don't have one
             if(!mTarget) {
                 mTarget = FindClosest("Free");
                 if(mTarget) {
+                    // notify that character that they are the target and start chasing it for 2 seconds
                     mTarget.GetComponent<AIMovement>().SetTarget(true);
                     mChaseTimer = 2.0f;
                 }
                 else {
+                    // no targets can be found so wander around and trigger the end of round
                     Wander();
                     mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
                     onRoundEnd?.Invoke();
                 }
             }
+            // behavior to chase our current target
             else {
                 mChaseTimer -= Time.deltaTime;
+
+                // chased target for too long, switch to another
                 if(mChaseTimer <= 0.0f) {
-                    // chased target for too long, switch to another
+                    // notify our current target that they are no longer being chased
                     AIMovement targetAI = mTarget.gameObject.GetComponent<AIMovement>();
                     targetAI.SetTarget(false);
                     targetAI.tag = "Free";
+
+                    // find the next target (might be the same)
                     mTarget = FindClosest("Free");
                     if(mTarget) {
+                        // notify that character that they are the target and start chasing it for 2 seconds
                         mTarget.GetComponent<AIMovement>().SetTarget(true);
                         mChaseTimer = 2.0f;
                     }
@@ -102,10 +109,15 @@ public class AIMovement : MonoBehaviour
                 if(mTarget) {
                     Vector3 targetDirection = mTarget.transform.position - transform.position;
 
+                    // **********************
+                    // HEURISTIC A.i and A.ii
+                    // **********************
                     if(!mIsMoving) {
-                        if(targetDirection.magnitude < mEpsilon) {
+                        // step directly to the target if we are close enough
+                        if(Mathf.Approximately(targetDirection.magnitude, 0.0f)) {
                             transform.position = mTarget.transform.position;
                         }
+                        // turn on the spot to face the target
                         else {
                             Align(targetDirection);
                             mAnimator.SetFloat("Blend", 0.0f);
@@ -114,6 +126,9 @@ public class AIMovement : MonoBehaviour
                                 mIsMoving = true;
                         }
                     }
+                    // **********************
+                    // HEURISTIC B.i and B.ii
+                    // **********************
                     else {
                         if(targetDirection.magnitude < radius) {
                             // reached the target
@@ -122,7 +137,6 @@ public class AIMovement : MonoBehaviour
                             mIsMoving = false;
                         }
                         else {
-                            // TODO: Add speed dependant angle of perception
                             float angle = Vector3.Angle(targetDirection, transform.forward);
                             if(angle < mPerceptionAngle) {
                                 Pursue(mTarget);
@@ -138,18 +152,25 @@ public class AIMovement : MonoBehaviour
                 }
             }
         }
-        // behavior for chased characters
+        
+        // ********************************
+        // BEHAVIOR FOR UNTAGGED CHARACTERS
+        // ********************************
         else { // if(!mIsTagged)
             // turn off particles
             gameObject.GetComponent<ParticleSystem>().Stop();
-            // behavior for untagged characters
+
             if(!mIsFrozen) {
                 mSpeed = baseSpeed;
                 mMaxVelocity = mSpeed;
 
+                // behavior for the currently chased character
                 if(mIsTarget) {
 
-                    // recently transitioned to other side of level, keep moving forward so it doesn't bounce back accross the boundary
+                    // We recently hit a boundary so keep moving forward for the remainder of mBoundaryTimer time.
+                    // This hack helps prevent a situation where the last unfrozen character endlessly moves back 
+                    // and forth accross the same boundary (since crossing a boundary now makes the character face the pursuer,
+                    // so they turn away)
                     if(mHitBoundary) {
                         Seek(transform.forward);
                     }
@@ -159,8 +180,11 @@ public class AIMovement : MonoBehaviour
                         if(mTarget) {
                             Vector3 targetDirection = transform.position - mTarget.transform.position;
 
+                            // **********************
+                            // HEURISTIC C.i and C.ii
+                            // **********************
                             if(!mIsMoving) {
-                                if(targetDirection.magnitude < mEpsilon) {
+                                if(Mathf.Approximately(targetDirection.magnitude, 0.0f)) {
                                     transform.position += targetDirection.normalized / 10.0f;
                                 }
                                 else {
@@ -172,10 +196,10 @@ public class AIMovement : MonoBehaviour
                                 }
                             }
                             else {
-                                // TODO: Add speed dependant angle of perception
                                 float angle = Vector3.Angle(targetDirection, transform.forward);
                                 if(angle < mPerceptionAngle) {
-                                    // Note that since targetDirection is inversed (transform.pos - target.pos) Seek is essentially a flee behavior
+                                    // Note that since targetDirection is inversed (transform.pos - target.pos),
+                                    // Seek is essentially a flee behavior here
                                     Seek(targetDirection);
                                     mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
                                 }
@@ -189,13 +213,17 @@ public class AIMovement : MonoBehaviour
                     }
                 }
                 else { // if(mIsTarget)
-                    // find a target to free
+                    // free and not currently being chased so find a character to unfreeze
                     mTarget = FindClosest("Frozen");
                     if(mTarget) {
                         Vector3 targetDirection = mTarget.transform.position - transform.position;
+
+                        // **********************
+                        // HEURISTIC A.i and A.ii
+                        // **********************
                         if(!mIsMoving) {
-                            if(targetDirection.magnitude < mEpsilon) {
-                                transform.position += targetDirection.normalized / 10.0f;
+                            if(Mathf.Approximately(targetDirection.magnitude, 0.0f)) {
+                                transform.position = mTarget.transform.position;
                             }
                             else {
                                 Align(targetDirection);
@@ -205,6 +233,10 @@ public class AIMovement : MonoBehaviour
                                     mIsMoving = true;
                             }
                         }
+
+                        // **********************
+                        // HEURISTIC B.i and B.ii
+                        // **********************
                         else {
                             if(targetDirection.magnitude < radius) {
                                 // reached the target
@@ -240,7 +272,9 @@ public class AIMovement : MonoBehaviour
         }
     }
 
+    // **************
     // HELPER METHODS
+    // **************
 
     public void Freeze() {
         SetFrozen(true);
@@ -276,16 +310,21 @@ public class AIMovement : MonoBehaviour
                 distanceToTarget = targetDirection.sqrMagnitude;
             }
         }
-        if(closestTarget)
-            return closestTarget;
-        return null;
+
+        // return closest target if it exists, otherwise return null
+        return closestTarget ? closestTarget : null;
     }
 
-bool CheckBoundary() {
+    // Check the characters position on the xz plane and warp it to the opposite side if we get too far from the origin.
+    // note that we first bring the character back by 0.5 units before warping so that they don't immediately retrigger this
+    // method next frame.
+    bool CheckBoundary() {
         Vector3 position = transform.position;
         if(Mathf.Abs(position.x) > 17.5f) {
             position.x += position.x > 0 ? -0.5f : 0.5f;
             position.x *= -1;
+            // if the character that hit the boundary is the current target, we should set their boundary timer,
+            // otherwise we don't care.
             if(mIsTarget) {
                 mHitBoundary = true;
                 mBoundaryTimer = 2.0f;
@@ -297,6 +336,8 @@ bool CheckBoundary() {
         else if(Mathf.Abs(position.z) > 17.5f) {
             position.z += position.z > 0 ? -0.5f : 0.5f;
             position.z *= -1;
+            // if the character that hit the boundary is the current target, we should set their boundary timer,
+            // otherwise we don't care.
             if(mIsTarget) {
                 mHitBoundary = true;
                 mBoundaryTimer = 2.0f;
@@ -315,8 +356,11 @@ bool CheckBoundary() {
         return mHitBoundary;
     }
 
+    // ******************
     // MOVEMENT BEHAVIORS
+    // ******************
 
+    // Incrementally look in the direction of the target
     void Align(Vector3 direction) {
         float step = rotationSpeed * Time.deltaTime; ;
 
@@ -324,12 +368,14 @@ bool CheckBoundary() {
         transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, step);
     }
 
+    // Seek a position 1 unit ahead of where the target character is facing
     void Pursue(GameObject target) {
-        Vector3 targetPosition = (target.transform.position + target.transform.forward) - transform.position;
+        Vector3 targetPosition = target.transform.position + target.transform.forward - transform.position;
         Seek(targetPosition);
         Align(targetPosition);
     }
 
+    // move towards direction with maximum velocity
     void Seek(Vector3 direction) {
         mVelocity = direction * mSpeed;
         if(mVelocity.magnitude > mMaxVelocity)
@@ -337,21 +383,19 @@ bool CheckBoundary() {
         transform.position += mVelocity * Time.deltaTime;
     }
 
-    void Flee(Vector3 direction) {
-        mVelocity = direction.normalized * mSpeed;
-
-        transform.position += mVelocity * Time.deltaTime;
-    }
-
+    // use kinematic arrive to slow down as we reach the target position
+    // prevents overshooting the target
     void Arrive(Vector3 direction) {
-        mVelocity = (direction / timeToTarget) * mSpeed;
+        mVelocity = direction / timeToTarget;
         if(mVelocity.magnitude > mMaxVelocity) {
             mVelocity = mVelocity.normalized * mMaxVelocity;
         }
         transform.position += mVelocity * Time.deltaTime;
     }
 
+    // wander in a random direction
     void Wander() {
+        // generate a random angle (higher distribution of angles near 0.0f)
         float angle = (Random.Range(-1.0f, 1.0f) - Random.Range(-1.0f, 1.0f));
         float step = angle * rotationSpeed * Time.deltaTime;
         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
@@ -363,7 +407,9 @@ bool CheckBoundary() {
         transform.position += mVelocity * Time.deltaTime;
     }
 
+    // **************
     // STATE CHANGERS
+    // **************
 
     public void SetTagged(bool status) {
         mIsTagged = status;
@@ -383,9 +429,5 @@ bool CheckBoundary() {
 
     public void SetHitBoundary(bool status) {
         mHitBoundary = status;
-    }
-
-    public void SetBoundaryTimer() {
-        mBoundaryTimer = 2.0f;
     }
 }

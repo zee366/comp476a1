@@ -1,17 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LightMover : MonoBehaviour
 {
     GameObject target;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
+    // have the spot light stay directly above the currently tagged character
     void Update()
     {
         target = GameObject.FindGameObjectWithTag("Tagged");

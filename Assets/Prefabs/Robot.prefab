@@ -6437,10 +6437,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseSpeed: 1
-  chaseSpeed: 4
+  chaseSpeed: 3.5
   rotationSpeed: 100
   radius: 1.4
-  timeToTarget: 0.5
+  timeToTarget: 4
   prefab: {fileID: 5632163283982583302, guid: e3487aaccdd6eb04ea87d601b8d53338, type: 3}
   onRoundEnd:
     m_PersistentCalls:
