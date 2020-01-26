@@ -137,8 +137,19 @@ public class AIMovement : MonoBehaviour
                             mIsMoving = false;
                         }
                         else {
-                            float angle = Vector3.Angle(targetDirection, transform.forward);
-                            if(angle < mPerceptionAngle) {
+                            float perceptionAngle = Mathf.Clamp(25.0f, mPerceptionAngle * (1.0f - (mVelocity.magnitude / mMaxVelocity)), mPerceptionAngle);
+                            //float perceptionAngle = mPerceptionAngle;
+
+                            // angle to target
+                            float angle = Vector3.Angle(transform.forward, targetDirection + mTarget.transform.forward);
+
+                            Vector3 rightRay = Quaternion.AngleAxis(perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                            Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), rightRay, Color.red);
+
+                            Vector3 leftRay = Quaternion.AngleAxis(-perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                            Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), leftRay, Color.red);
+
+                            if(Mathf.Abs(angle) < perceptionAngle) {
                                 Pursue(mTarget);
                                 mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
                             }
@@ -196,8 +207,19 @@ public class AIMovement : MonoBehaviour
                                 }
                             }
                             else {
-                                float angle = Vector3.Angle(targetDirection, transform.forward);
-                                if(angle < mPerceptionAngle) {
+                                float perceptionAngle = Mathf.Clamp(25.0f, mPerceptionAngle * (1.0f - (mVelocity.magnitude / mMaxVelocity)), mPerceptionAngle);
+                                //float perceptionAngle = mPerceptionAngle;
+
+                                // angle to target
+                                float angle = Vector3.Angle(transform.forward, targetDirection);
+
+                                Vector3 rightRay = Quaternion.AngleAxis(perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                                Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), rightRay, Color.red);
+
+                                Vector3 leftRay = Quaternion.AngleAxis(-perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                                Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), leftRay, Color.red);
+
+                                if(Mathf.Abs(angle) < perceptionAngle) {
                                     // Note that since targetDirection is inversed (transform.pos - target.pos),
                                     // Seek is essentially a flee behavior here
                                     Seek(targetDirection);
@@ -245,8 +267,18 @@ public class AIMovement : MonoBehaviour
                                 mIsMoving = false;
                             }
                             else {
-                                float angle = Vector3.Angle(targetDirection, transform.forward);
-                                if(angle < mPerceptionAngle) {
+                                float perceptionAngle = Mathf.Clamp(25.0f, mPerceptionAngle * (1.0f - (mVelocity.magnitude / mMaxVelocity)), mPerceptionAngle);
+
+                                // angle to target
+                                float angle = Vector3.Angle(transform.forward, targetDirection);
+
+                                Vector3 rightRay = Quaternion.AngleAxis(perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                                Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), rightRay, Color.red);
+
+                                Vector3 leftRay = Quaternion.AngleAxis(-perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                                Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), leftRay, Color.red);
+
+                                if(Mathf.Abs(angle) < perceptionAngle) {
                                     Arrive(targetDirection);
                                     mAnimator.SetFloat("Blend", mVelocity.magnitude / mMaxVelocity);
                                 }
