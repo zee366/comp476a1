@@ -6,6 +6,10 @@ Assignment 1
 Jason Brennan
 27793928
 
+TO RUN THE PROGRAM:
+
+- Run the executable located in bin/
+
 SPECIAL FEATURES:
 
 - The tagged character is surrounded by a swirling vortex of snow particles to better differentiate them from the other characters. In addition, a spot light follows the tagged character around. The swirling vortex was created using Unity's particle system.
