@@ -31,12 +31,13 @@ public class AIMovement : MonoBehaviour
     private float mSpeed;
     private float mChaseTimer;
     private float mBoundaryTimer;
-    private GameObject mTarget;
 
     // other
     public UnityEvent onRoundEnd;
+    private GameObject mTarget;
     private GameObject mIceBlock;
     private Animator mAnimator;
+    private bool debug;
     
     void Start()
     {
@@ -46,6 +47,9 @@ public class AIMovement : MonoBehaviour
         mBoundaryTimer = 0.0f;
         mPerceptionAngle = 45.0f;
         mAnimator = GetComponent<Animator>();
+
+        // SET DEBUG TO TRUE TO ADD PERCEPTION ANGLE RAYS TO THE SCENE VIEW
+        debug = false;
     }
 
     void Update()
@@ -138,16 +142,18 @@ public class AIMovement : MonoBehaviour
                         }
                         else {
                             float perceptionAngle = Mathf.Clamp(25.0f, mPerceptionAngle * (1.0f - (mVelocity.magnitude / mMaxVelocity)), mPerceptionAngle);
-                            //float perceptionAngle = mPerceptionAngle;
 
                             // angle to target
                             float angle = Vector3.Angle(transform.forward, targetDirection + mTarget.transform.forward);
 
-                            Vector3 rightRay = Quaternion.AngleAxis(perceptionAngle, Vector3.up) * transform.forward * 3.0f;
-                            Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), rightRay, Color.red);
+                            // set debug to true in Start() if you want to see perception angle rays in scene view
+                            if(debug) {
+                                Vector3 rightRay = Quaternion.AngleAxis(perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                                Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), rightRay, Color.red);
 
-                            Vector3 leftRay = Quaternion.AngleAxis(-perceptionAngle, Vector3.up) * transform.forward * 3.0f;
-                            Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), leftRay, Color.red);
+                                Vector3 leftRay = Quaternion.AngleAxis(-perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                                Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), leftRay, Color.red);
+                            }
 
                             if(Mathf.Abs(angle) < perceptionAngle) {
                                 Pursue(mTarget);
@@ -213,11 +219,14 @@ public class AIMovement : MonoBehaviour
                                 // angle to target
                                 float angle = Vector3.Angle(transform.forward, targetDirection);
 
-                                Vector3 rightRay = Quaternion.AngleAxis(perceptionAngle, Vector3.up) * transform.forward * 3.0f;
-                                Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), rightRay, Color.red);
+                                // set debug to true in Start() if you want to see perception angle rays in scene view
+                                if(debug) {
+                                    Vector3 rightRay = Quaternion.AngleAxis(perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                                    Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), rightRay, Color.red);
 
-                                Vector3 leftRay = Quaternion.AngleAxis(-perceptionAngle, Vector3.up) * transform.forward * 3.0f;
-                                Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), leftRay, Color.red);
+                                    Vector3 leftRay = Quaternion.AngleAxis(-perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                                    Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), leftRay, Color.red);
+                                }
 
                                 if(Mathf.Abs(angle) < perceptionAngle) {
                                     // Note that since targetDirection is inversed (transform.pos - target.pos),
@@ -272,11 +281,14 @@ public class AIMovement : MonoBehaviour
                                 // angle to target
                                 float angle = Vector3.Angle(transform.forward, targetDirection);
 
-                                Vector3 rightRay = Quaternion.AngleAxis(perceptionAngle, Vector3.up) * transform.forward * 3.0f;
-                                Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), rightRay, Color.red);
+                                // set debug to true in Start() if you want to see perception angle rays in scene view
+                                if(debug) {
+                                    Vector3 rightRay = Quaternion.AngleAxis(perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                                    Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), rightRay, Color.red);
 
-                                Vector3 leftRay = Quaternion.AngleAxis(-perceptionAngle, Vector3.up) * transform.forward * 3.0f;
-                                Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), leftRay, Color.red);
+                                    Vector3 leftRay = Quaternion.AngleAxis(-perceptionAngle, Vector3.up) * transform.forward * 3.0f;
+                                    Debug.DrawRay(transform.position + new Vector3(0.0f, 1.0f, 0.0f), leftRay, Color.red);
+                                }
 
                                 if(Mathf.Abs(angle) < perceptionAngle) {
                                     Arrive(targetDirection);
@@ -326,6 +338,7 @@ public class AIMovement : MonoBehaviour
         }
     }
 
+    // Finds the closest object with the specified tag
     GameObject FindClosest(string tag) {
         GameObject closestTarget = null;
         float distanceToTarget = Mathf.Infinity;
